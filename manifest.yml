@@ -1,0 +1,23 @@
+---
+language: droplet
+exclude_files:
+- ".git/"
+- ".gitignore"
+- ".gitmodules"
+- ".rspec"
+- cf_spec/
+- log/
+- test/
+- buildpack-packager/
+- cfdroplet_buildpack-*v*.zip
+url_to_dependency_map:
+- match: jq
+  name: jq-linux64
+  version: 1.5
+dependencies:
+- name: jq-linux64
+  version: 1.5
+  uri: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
+  md5: 6a342dbb17b2f2ea4ec0e64d2157614d
+  cf_stacks:
+  - cflinuxfs2

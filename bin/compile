@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+set -e            # fail fast
+set -o pipefail   # do not ignore exit codes when piping output
+# set -x            # enable debugging
+
+# Configure directories
+build_dir=$1
+cache_dir=$2
+
+compile_buildpack_dir=$(cd $(dirname $0); cd ..; pwd)
+compile_buildpack_bin=$compile_buildpack_dir/bin
+$compile_buildpack_dir/compile-extensions/bin/check_stack_support
+
+# Load some convenience functions like status(), echo(), and indent()
+source $compile_buildpack_dir/bin/common.sh
+BUILDPACK_PATH=$compile_buildpack_dir source $compile_buildpack_dir/compile-extensions/lib/common
+
+jq_translated_url=$($compile_buildpack_dir/compile-extensions/bin/download_dependency jq /tmp)
+jq="/tmp/jq"
+chmod 0744 $jq
+
+# Copy droplet application bits
+status "Extracting droplet bits"
+
+archive=$(find $1 \( -name "*.tar" -o -name "*.tgz" \) -print)
+filename=$(basename $archive)
+name="${filename%.*}"
+mkdir /tmp/$name
+tar xzf $archive -C /tmp/$name
+find /tmp/$name -type f -perm 0444 -print | xargs chmod 0644
+rm -f $archive
+
+shopt -s dotglob
+mv /tmp/$name/app/* $build_dir
+mv /tmp/$name/staging_info.yml /tmp
+rm -fr /tmp/$name

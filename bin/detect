@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# bin/detect <build-dir>
+
+# set -x
+
+BP=$(dirname $(dirname $0))
+
+num_archives=$(find $1 \( -name "*.tar" -o -name "*.tgz" \) -print | wc -l | sed 's| ||g')
+if [[ $num_archives == 1 ]]; then 
+  archive=$(find $1 \( -name "*.tar" -o -name "*.tgz" \) -print)
+  tar tvzf $archive | grep "/staging_info.yml" 2>&1 > /dev/null
+  if [ $? == 0 ]; then
+    echo "cfdroplet buildpack `cat $BP/VERSION`" && exit 0
+  fi
+fi
+echo "no" && exit 1

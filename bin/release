@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# bin/release <build-dir>
+
+# set -x
+
+echo -e "---\ndefault_process_types:\n  web: $(cat /tmp/staging_info.yml | /tmp/jq .start_command | sed 's|^"||' | sed 's|"$||' | sed 's|\\"|"|g')"
